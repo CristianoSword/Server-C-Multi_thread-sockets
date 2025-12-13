@@ -72,3 +72,13 @@ typedef struct {
     pthread_mutex_t mutex;
 } LRUCache;
 
+// 4. Sistema de logging assíncrono
+typedef struct {
+    FILE *arquivo_log;
+    pthread_mutex_t mutex_log;
+    pthread_cond_t cond_log;
+    char **buffer_log;
+    int indice_escrita;
+    int indice_leitura;
+    pthread_t thread_logger;
+} SistemaLog;
