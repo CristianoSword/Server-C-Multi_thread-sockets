@@ -101,3 +101,52 @@ int multiplicacao_otimizada(int a, int b) {
     );
     return resultado;
 }
+
+// 7. Sistema de plugins/dynamic loading
+typedef void (*PluginInitFunc)(void*);
+typedef void (*PluginProcessFunc)(const char*, void*);
+
+typedef struct {
+    void *handle;
+    PluginInitFunc init;
+    PluginProcessFunc process;
+    char nome[50];
+} Plugin;
+
+// Declaração forward
+void registrar_plugin(Plugin *plugin);
+
+void carregar_plugins(const char *diretorio) {
+    DIR *dir = opendir(diretorio);
+    if (!dir) {
+        perror("Erro ao abrir diretório");
+        return;
+    }
+    
+    struct dirent *entrada;
+    
+    while ((entrada = readdir(dir)) != NULL) {
+        if (strstr(entrada->d_name, ".so")) {
+            char caminho[256];
+            snprintf(caminho, sizeof(caminho), "%s/%s", 
+                     diretorio, entrada->d_name);
+            
+            void *handle = dlopen(caminho, RTLD_LAZY);
+            if (handle) {
+                Plugin *plugin = malloc(sizeof(Plugin));
+                plugin->handle = handle;
+                plugin->init = dlsym(handle, "plugin_init");
+                plugin->process = dlsym(handle, "plugin_process");
+                
+                if (plugin->init && plugin->process) {
+                    plugin->init(NULL); // Inicializa plugin
+                    registrar_plugin(plugin);
+                }
+            } else {
+                fprintf(stderr, "Erro ao carregar %s: %s\n", 
+                        caminho, dlerror());
+            }
+        }
+    }
+    closedir(dir);
+}
