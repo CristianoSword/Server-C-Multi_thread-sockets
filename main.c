@@ -150,3 +150,24 @@ void carregar_plugins(const char *diretorio) {
     }
     closedir(dir);
 }
+
+// Implementações stub das funções faltantes
+void processar_requisicao_distribuida(const char *buffer, ConexaoCliente *conexao) {
+    // Implementação da lógica de processamento
+    printf("Processando requisição: %s\n", buffer);
+}
+
+void registrar_plugin(Plugin *plugin) {
+    // Implementação do registro de plugins
+    printf("Plugin registrado: %s\n", plugin->nome);
+}
+
+int main() {
+    printf("Sistema multi-thread compilado com sucesso!\n");
+    
+    // Teste de multiplicação otimizada
+    int resultado = multiplicacao_otimizada(5, 7);
+    printf("Multiplicação otimizada: 5 x 7 = %d\n", resultado);
+    
+    return 0;
+}
