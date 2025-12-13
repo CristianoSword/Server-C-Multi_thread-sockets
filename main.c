@@ -82,3 +82,11 @@ typedef struct {
     int indice_leitura;
     pthread_t thread_logger;
 } SistemaLog;
+// 5. Balanceador de carga
+typedef struct {
+    struct sockaddr_in servidores[5];
+    int atual; // Para round-robin
+    int servidores_ativos;
+    int *health_check; // Status dos servidores
+    pthread_mutex_t mutex_balanceamento;
+} BalanceadorCarga;
