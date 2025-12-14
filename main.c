@@ -2,7 +2,7 @@
  * ============================================================================
  * Program: Server System C - Multi-thread with Socket 
  * Author: Cristiano Camacho
- * Date: 12/13/2025
+ * Date: 12/14/2025
  * ============================================================================
  * Description:
  *   Advanced multi-thread server system with the following features:
