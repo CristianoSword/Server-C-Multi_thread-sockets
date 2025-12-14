@@ -1,128 +1,133 @@
-# Sistema Server C Multi-thread com Sockets
+# Multi-threaded C Socket Server System
 
-Sistema de servidor TCP multi-thread em C demonstrando conceitos avançados de programação concorrente e comunicação em rede.
+A multi-threaded TCP server system in C demonstrating advanced concepts of concurrent programming and network communication.
 
-## Características
+## Features
 
-- **Pool de Threads** - Limite de 10 threads simultâneas com controle por semáforo
-- **Cache LRU** - Sistema de cache thread-safe com política Least Recently Used
-- **Logging Assíncrono** - Thread dedicada com buffer circular de 1000 mensagens
-- **Balanceador de Carga** - Distribuição round-robin entre até 5 servidores
-- **Sistema de Plugins** - Carregamento dinâmico de DLLs (Windows) ou .so (Linux)
-- **Socket TCP** - Servidor HTTP básico na porta 9090
+* **Thread Pool** – Limit of 10 simultaneous threads controlled by a semaphore
+* **LRU Cache** – Thread-safe cache system with a Least Recently Used policy
+* **Asynchronous Logging** – Dedicated thread with a circular buffer of 1000 messages
+* **Load Balancer** – Round-robin distribution across up to 5 servers
+* **Plugin System** – Dynamic loading of DLLs (Windows) or .so files (Linux)
+* **TCP Socket** – Basic HTTP server on port 9090
 
-## Requisitos
+## Requirements
 
-**Windows:** MinGW-w64 ou MSVC, Winsock2  
+**Windows:** MinGW-w64 or MSVC, Winsock2
 **Linux:** GCC/Clang, pthread, libdl
 
-## Compilação
+## Compilation
 
 ```bash
 # Windows
-gcc server.c -o servidor.exe -lws2_32
+gcc server.c -o server.exe -lws2_32
 
 # Linux
-gcc server.c -o servidor -lpthread -ldl -Wall -O2
+gcc server.c -o server -lpthread -ldl -Wall -O2
 ```
 
-## Execução
+## Execution
 
 ```bash
 # Windows
-servidor.exe
+server.exe
 
 # Linux
-./servidor
+./server
 ```
 
-Teste com: `curl http://localhost:9090`
+Test with: `curl http://localhost:9090`
 
-## Configuração
+## Configuration
 
-Edite as constantes no código:
+Edit the constants in the code:
 
 ```c
-#define MAX_THREADS 10          // Threads simultâneas
-#define CACHE_CAPACITY 100      // Entradas no cache
-#define PORTA_SERVIDOR 9090     // Porta do servidor
-#define MAX_PLUGINS 10          // Plugins máximos
+#define MAX_THREADS 10          // Simultaneous threads
+#define CACHE_CAPACITY 100      // Cache entries
+#define SERVER_PORT 9090        // Server port
+#define MAX_PLUGINS 10          // Maximum plugins
 ```
 
-## Estrutura
+## Structure
 
 ```
-main() 
-  └─> servidor_socket()
-       └─> gerenciador_conexoes()
-            └─> processar_requisicao_distribuida()
-                 ├─> Cache LRU
-                 ├─> Logger Assíncrono
-                 ├─> Balanceador
+main()
+  └─> socket_server()
+       └─> connection_manager()
+            └─> distributed_request_processing()
+                 ├─> LRU Cache
+                 ├─> Asynchronous Logger
+                 ├─> Load Balancer
                  └─> Plugins
 ```
 
-## Criando Plugins
+## Creating Plugins
 
 ### Linux (.so)
+
 ```c
 void plugin_init(void* context) { }
-void plugin_process(const char* dados, void* context) { }
+void plugin_process(const char* data, void* context) { }
 ```
-Compile: `gcc -shared -fPIC meu_plugin.c -o meu_plugin.so`
+
+Compile: `gcc -shared -fPIC my_plugin.c -o my_plugin.so`
 
 ### Windows (.dll)
+
 ```c
 __declspec(dllexport) void plugin_init(void* context) { }
-__declspec(dllexport) void plugin_process(const char* dados, void* context) { }
+__declspec(dllexport) void plugin_process(const char* data, void* context) { }
 ```
-Compile: `gcc -shared meu_plugin.c -o meu_plugin.dll`
 
-Coloque os plugins na pasta `./plugins/`
+Compile: `gcc -shared my_plugin.c -o my_plugin.dll`
+
+Place the plugins in the `./plugins/` folder
 
 ## Troubleshooting
 
-**Porta em uso (erro 10013/EADDRINUSE):**
+**Port in use (error 10013/EADDRINUSE):**
+
 ```bash
 # Windows
 netstat -ano | findstr :9090
-taskkill /PID <numero> /F
+taskkill /PID <number> /F
 
 # Linux
 sudo lsof -i :9090
 sudo kill <PID>
 ```
 
-**Sem permissão:** Execute como administrador ou mude para porta > 1024
+**Permission denied:** Run as administrator or switch to a port > 1024
 
-## Conceitos Demonstrados
+## Concepts Demonstrated
 
-**Concorrência:** Threads, semáforos, mutexes, condition variables  
-**Rede:** Sockets TCP, protocolo HTTP básico  
-**Arquitetura:** Cache LRU, producer-consumer, plugin system, load balancing  
-**Sistemas:** Dynamic loading, signal handling, file I/O assíncrono
+**Concurrency:** Threads, semaphores, mutexes, condition variables
+**Networking:** TCP sockets, basic HTTP protocol
+**Architecture:** LRU cache, producer-consumer, plugin system, load balancing
+**Systems:** Dynamic loading, signal handling, asynchronous file I/O
 
-## Diferenças Windows vs Linux
+## Windows vs Linux Differences
 
-| Recurso | Windows | Linux |
-|---------|---------|-------|
-| Threads | CreateThread | pthread_create |
-| Mutex | CRITICAL_SECTION | pthread_mutex_t |
-| Semáforo | CreateSemaphore | sem_t |
-| Sockets | Winsock2 | POSIX sockets |
-| Plugins | LoadLibrary (.dll) | dlopen (.so) |
+| Feature   | Windows            | Linux           |
+| --------- | ------------------ | --------------- |
+| Threads   | CreateThread       | pthread_create  |
+| Mutex     | CRITICAL_SECTION   | pthread_mutex_t |
+| Semaphore | CreateSemaphore    | sem_t           |
+| Sockets   | Winsock2           | POSIX sockets   |
+| Plugins   | LoadLibrary (.dll) | dlopen (.so)    |
 
 ## Performance
 
-- Requisições/segundo: ~5000-10000
-- Latência média: <1ms
-- Conexões simultâneas: 10 (MAX_THREADS)
-- Memória: ~5-10 MB base
+* Requests/second: ~5000–10000
+* Average latency: <1ms
+* Simultaneous connections: 10 (MAX_THREADS)
+* Memory usage: ~5–10 MB base
 
-## Notas
+## Notes
 
-Projeto educacional demonstrando técnicas avançadas. Para produção, adicione tratamento robusto de erros, HTTPS, autenticação e rate limiting.
+Educational project demonstrating advanced techniques. For production use, add robust error handling, HTTPS, authentication, and rate limiting.
 
-## Licença
+## License
 
-MIT License - Livre para uso e modificação.
+MIT License – Free for use and modification.
